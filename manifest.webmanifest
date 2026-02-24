@@ -1,0 +1,19 @@
+{
+  "name": "Часы НПЦ ПЗДП",
+  "short_name": "Часы",
+  "description": "Аналоговые часы с будильниками по московскому времени.",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#02040a",
+  "theme_color": "#02040a",
+  "lang": "ru",
+  "icons": [
+    {
+      "src": "icons/icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}
