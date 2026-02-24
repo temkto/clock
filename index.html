@@ -8,12 +8,12 @@
     :root {
       color-scheme: dark;
       --face-size: min(74vmin, 760px);
-      --face-color: #111827;
-      --border-color: #374151;
+      --face-color: #090b11;
+      --border-color: #aeb4bf;
       --accent: #ef4444;
       --mark-color: #d1d5db;
       --hand-color: #f9fafb;
-      --track-radius: calc(0.41 * var(--face-size));
+      --track-radius: calc(0.446 * var(--face-size));
     }
 
     * {
@@ -23,7 +23,7 @@
     body {
       margin: 0;
       min-height: 100dvh;
-      background: radial-gradient(circle at center, #1f2937 0%, #030712 70%);
+      background: radial-gradient(circle at center, #151a24 0%, #02040a 72%);
       font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif;
       color: #f3f4f6;
       padding: 24px;
@@ -54,15 +54,23 @@
       aspect-ratio: 1;
       border-radius: 50%;
       background: var(--face-color);
-      border: clamp(6px, 1.2vmin, 12px) solid var(--border-color);
-      box-shadow: 0 0 32px rgba(0, 0, 0, 0.45), inset 0 0 22px rgba(255, 255, 255, 0.06);
+      border: clamp(8px, 1.4vmin, 15px) solid #d8dde6;
+      background:
+        radial-gradient(circle at 34% 22%, rgba(255, 255, 255, 0.24), transparent 38%),
+        radial-gradient(circle at 70% 74%, rgba(255, 255, 255, 0.13), transparent 35%),
+        radial-gradient(circle at center, #2a2e36 0%, #0e1118 62%, #07090d 100%);
+      box-shadow:
+        0 0 36px rgba(0, 0, 0, 0.6),
+        inset 0 0 4px rgba(255, 255, 255, 0.75),
+        inset 0 0 28px rgba(255, 255, 255, 0.1),
+        inset 0 -12px 30px rgba(0, 0, 0, 0.8);
       display: grid;
       place-items: center;
       transition: box-shadow 0.25s ease, border-color 0.25s ease;
     }
 
     .clock.alarm-active {
-      border-color: #fbbf24;
+      border-color: #f1c84d;
       box-shadow: 0 0 46px rgba(251, 191, 36, 0.65), inset 0 0 30px rgba(239, 68, 68, 0.45);
       animation: pulse 1s infinite;
     }
@@ -81,8 +89,81 @@
       width: clamp(12px, 1.8vmin, 18px);
       height: clamp(12px, 1.8vmin, 18px);
       border-radius: 50%;
-      background: #fff;
+      background: radial-gradient(circle at 35% 30%, #f8fafc 0%, #adb7c5 70%, #6b7280 100%);
+      box-shadow: 0 0 0 2px rgba(0, 0, 0, 0.5);
       z-index: 20;
+    }
+
+    .bezel-ring,
+    .minute-track,
+    .inner-circle,
+    .blue-ring {
+      position: absolute;
+      border-radius: 50%;
+    }
+
+    .bezel-ring {
+      inset: clamp(10px, 1.7vmin, 18px);
+      border: clamp(5px, 0.9vmin, 10px) solid #090b10;
+      box-shadow: inset 0 0 0 2px rgba(255, 255, 255, 0.2);
+      z-index: 0;
+    }
+
+    .minute-track {
+      inset: clamp(24px, 3.4vmin, 34px);
+      border: 2px solid rgba(181, 189, 203, 0.35);
+      z-index: 1;
+    }
+
+    .inner-circle {
+      inset: clamp(110px, 16vmin, 148px);
+      background:
+        radial-gradient(circle at 50% 15%, rgba(255, 255, 255, 0.14), transparent 48%),
+        radial-gradient(circle at center, #343941 0%, #191d24 68%, #10141b 100%);
+      border: 2px solid rgba(223, 231, 242, 0.35);
+      box-shadow: inset 0 0 26px rgba(0, 0, 0, 0.6);
+      z-index: 4;
+      display: grid;
+      place-items: center;
+      overflow: hidden;
+    }
+
+    .blue-ring {
+      inset: clamp(98px, 14.4vmin, 136px);
+      border: clamp(3px, 0.55vmin, 6px) solid #18adff;
+      box-shadow: 0 0 0 2px rgba(8, 10, 18, 0.8), 0 0 14px rgba(24, 173, 255, 0.4);
+      z-index: 5;
+    }
+
+    .inner-content {
+      text-align: center;
+      width: 82%;
+      color: #e5e7eb;
+      z-index: 1;
+      position: relative;
+      margin-top: 6%;
+    }
+
+    .logo-mark {
+      font-size: clamp(62px, 9vmin, 102px);
+      line-height: 1;
+      filter: drop-shadow(0 6px 8px rgba(0, 0, 0, 0.6));
+    }
+
+    .org-title {
+      margin-top: 8px;
+      font-size: clamp(18px, 2.35vmin, 26px);
+      font-weight: 700;
+      letter-spacing: 0.03em;
+      text-transform: uppercase;
+    }
+
+    .org-subtitle {
+      margin-top: 2px;
+      font-size: clamp(15px, 2.1vmin, 24px);
+      font-style: italic;
+      font-family: 'Brush Script MT', 'Segoe Script', cursive;
+      color: #f3f4f6;
     }
 
     .mark {
@@ -90,21 +171,22 @@
       position: absolute;
       left: 50%;
       top: 50%;
-      width: 0.45vmin;
-      height: 2.4vmin;
-      min-height: 14px;
-      background: var(--mark-color);
+      width: 0.34vmin;
+      height: 1.6vmin;
+      min-height: 10px;
+      background: linear-gradient(#f1f5f9, #b7bfcb);
       border-radius: 999px;
       transform: translate(-50%, -50%) rotate(calc(var(--i) * 6deg)) translateY(calc(-1 * (var(--track-radius) - var(--mark-inset))));
       transform-origin: center center;
-      opacity: 0.95;
+      opacity: 0.72;
       z-index: 2;
     }
 
     .mark.major {
-      --mark-inset: clamp(12px, 1.8vmin, 20px);
-      height: 3.5vmin;
-      min-height: 20px;
+      --mark-inset: clamp(10px, 1.55vmin, 17px);
+      width: 0.7vmin;
+      height: 2.7vmin;
+      min-height: 15px;
       opacity: 1;
     }
 
@@ -117,13 +199,14 @@
       left: 50%;
       top: 50%;
       transform: translate(-50%, -50%) rotate(calc(var(--i) * 30deg)) translateY(calc(-1 * (var(--track-radius) - clamp(32px, 5.4vmin, 58px)))) rotate(calc(var(--i) * -30deg));
-      color: #f3f4f6;
-      font-weight: 600;
-      font-size: clamp(18px, 3.4vmin, 42px);
+      color: #f5f6f9;
+      font-family: 'Times New Roman', Georgia, serif;
+      font-weight: 500;
+      font-size: clamp(36px, 7.1vmin, 92px);
       line-height: 1;
       user-select: none;
-      z-index: 3;
-      text-shadow: 0 0 8px rgba(17, 24, 39, 0.75);
+      z-index: 6;
+      text-shadow: 0 1px 0 #fff, 0 3px 9px rgba(0, 0, 0, 0.9);
     }
 
     .hand {
@@ -132,39 +215,39 @@
       bottom: 50%;
       transform-origin: bottom center;
       border-radius: 999px;
-      z-index: 10;
+      z-index: 12;
     }
 
     .hour {
-      width: clamp(8px, 1vmin, 12px);
-      height: 23%;
-      background: var(--hand-color);
-      margin-left: calc(clamp(8px, 1vmin, 12px) / -2);
+      width: clamp(9px, 1.2vmin, 14px);
+      height: 22%;
+      background: linear-gradient(to right, #9fa7b5 0%, #f8fafc 50%, #9aa3b1 100%);
+      margin-left: calc(clamp(9px, 1.2vmin, 14px) / -2);
     }
 
     .minute {
-      width: clamp(5px, 0.7vmin, 8px);
-      height: 33%;
-      background: #e5e7eb;
-      margin-left: calc(clamp(5px, 0.7vmin, 8px) / -2);
+      width: clamp(6px, 0.85vmin, 10px);
+      height: 32%;
+      background: linear-gradient(to right, #b7becb 0%, #ffffff 50%, #a8b0be 100%);
+      margin-left: calc(clamp(6px, 0.85vmin, 10px) / -2);
     }
 
     .second {
-      width: clamp(2px, 0.35vmin, 4px);
+      width: clamp(2px, 0.28vmin, 3px);
       height: 41%;
-      background: var(--accent);
-      margin-left: calc(clamp(2px, 0.35vmin, 4px) / -2);
+      background: linear-gradient(#ff7b7b, #dc2626);
+      margin-left: calc(clamp(2px, 0.28vmin, 3px) / -2);
     }
 
     .label {
       position: absolute;
-      top: 18%;
-      font-size: clamp(14px, 2.2vmin, 24px);
-      color: #9ca3af;
-      letter-spacing: 0.08em;
+      top: 10.5%;
+      font-size: clamp(13px, 1.8vmin, 20px);
+      color: #aeb8c6;
+      letter-spacing: 0.25em;
       text-transform: uppercase;
       user-select: none;
-      z-index: 4;
+      z-index: 7;
     }
 
     .alarm-banner {
@@ -295,6 +378,16 @@
   <div class="layout">
     <section class="clock-wrap">
       <main class="clock" aria-label="Аналоговые часы с московским временем">
+        <div class="bezel-ring" aria-hidden="true"></div>
+        <div class="minute-track" aria-hidden="true"></div>
+        <div class="inner-circle" aria-hidden="true">
+          <div class="inner-content">
+            <div class="logo-mark">🏠</div>
+            <div class="org-title">НПЦ ПЗДП</div>
+            <div class="org-subtitle">им Г.Е. Сухаревой</div>
+          </div>
+        </div>
+        <div class="blue-ring" aria-hidden="true"></div>
         <div class="label">Moscow (MSK)</div>
         <div class="hand hour" id="hourHand"></div>
         <div class="hand minute" id="minuteHand"></div>
