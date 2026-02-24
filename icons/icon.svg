@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-label="Часы">
+  <defs>
+    <radialGradient id="bg" cx="35%" cy="30%" r="75%">
+      <stop offset="0%" stop-color="#2a2e36"/>
+      <stop offset="65%" stop-color="#0e1118"/>
+      <stop offset="100%" stop-color="#07090d"/>
+    </radialGradient>
+    <linearGradient id="ring" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#f8fafc"/>
+      <stop offset="100%" stop-color="#94a3b8"/>
+    </linearGradient>
+  </defs>
+  <rect width="512" height="512" rx="96" fill="#02040a"/>
+  <circle cx="256" cy="256" r="182" fill="url(#bg)" stroke="url(#ring)" stroke-width="18"/>
+  <circle cx="256" cy="256" r="8" fill="#f8fafc"/>
+  <line x1="256" y1="256" x2="256" y2="152" stroke="#f8fafc" stroke-width="16" stroke-linecap="round"/>
+  <line x1="256" y1="256" x2="332" y2="286" stroke="#ef4444" stroke-width="10" stroke-linecap="round"/>
+</svg>
