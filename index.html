@@ -7,7 +7,7 @@
   <style>
     :root {
       color-scheme: dark;
-      --face-size: min(92vmin, 920px);
+      --face-size: min(74vmin, 760px);
       --face-color: #111827;
       --border-color: #374151;
       --accent: #ef4444;
@@ -27,6 +27,22 @@
       place-items: center;
       background: radial-gradient(circle at center, #1f2937 0%, #030712 70%);
       font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif;
+      color: #f3f4f6;
+      padding: 24px;
+    }
+
+    .layout {
+      width: min(1100px, 100%);
+      display: grid;
+      grid-template-columns: minmax(320px, 1fr) minmax(280px, 360px);
+      gap: clamp(16px, 3vmin, 30px);
+      align-items: start;
+    }
+
+    .clock-wrap {
+      display: grid;
+      gap: 12px;
+      justify-items: center;
     }
 
     .clock {
@@ -39,6 +55,22 @@
       box-shadow: 0 0 32px rgba(0, 0, 0, 0.45), inset 0 0 22px rgba(255, 255, 255, 0.06);
       display: grid;
       place-items: center;
+      transition: box-shadow 0.25s ease, border-color 0.25s ease;
+    }
+
+    .clock.alarm-active {
+      border-color: #fbbf24;
+      box-shadow: 0 0 46px rgba(251, 191, 36, 0.65), inset 0 0 30px rgba(239, 68, 68, 0.45);
+      animation: pulse 1s infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% {
+        filter: saturate(1);
+      }
+      50% {
+        filter: saturate(1.5);
+      }
     }
 
     .center-dot {
@@ -131,22 +163,161 @@
       user-select: none;
       z-index: 4;
     }
+
+    .alarm-banner {
+      min-height: 52px;
+      width: min(100%, 680px);
+      padding: 10px 14px;
+      border-radius: 12px;
+      border: 1px solid #4b5563;
+      background: rgba(17, 24, 39, 0.7);
+      text-align: center;
+      font-size: clamp(15px, 2.1vmin, 18px);
+    }
+
+    .alarm-banner.active {
+      border-color: #f59e0b;
+      background: rgba(127, 29, 29, 0.65);
+      color: #fde68a;
+      font-weight: 600;
+      animation: blink 0.8s step-end infinite;
+    }
+
+    @keyframes blink {
+      50% {
+        opacity: 0.5;
+      }
+    }
+
+    .panel {
+      background: rgba(17, 24, 39, 0.65);
+      border: 1px solid #374151;
+      border-radius: 16px;
+      padding: 16px;
+      backdrop-filter: blur(5px);
+    }
+
+    .panel h2 {
+      margin: 0 0 12px;
+      font-size: 20px;
+    }
+
+    .alarm-form {
+      display: grid;
+      gap: 10px;
+      margin-bottom: 16px;
+    }
+
+    input, button {
+      width: 100%;
+      border: 1px solid #4b5563;
+      border-radius: 10px;
+      padding: 10px 12px;
+      background: #111827;
+      color: #f9fafb;
+      font-size: 15px;
+    }
+
+    button {
+      cursor: pointer;
+      background: #1d4ed8;
+      border-color: #1e40af;
+      font-weight: 600;
+    }
+
+    .stop-btn {
+      background: #b91c1c;
+      border-color: #991b1b;
+      margin-bottom: 12px;
+    }
+
+    .alarms-list {
+      display: grid;
+      gap: 8px;
+      max-height: 320px;
+      overflow: auto;
+      padding-right: 4px;
+    }
+
+    .alarm-item {
+      display: grid;
+      grid-template-columns: auto 1fr auto;
+      gap: 10px;
+      align-items: center;
+      border: 1px solid #374151;
+      border-radius: 10px;
+      padding: 10px;
+      background: rgba(3, 7, 18, 0.45);
+    }
+
+    .alarm-time { font-weight: 700; }
+    .alarm-text { color: #d1d5db; }
+
+    .delete-btn {
+      width: auto;
+      padding: 6px 10px;
+      background: #374151;
+      border-color: #4b5563;
+      font-size: 13px;
+    }
+
+    .empty {
+      color: #9ca3af;
+      margin: 0;
+      font-size: 14px;
+    }
+
+    @media (max-width: 940px) {
+      :root { --face-size: min(84vmin, 680px); }
+      .layout { grid-template-columns: 1fr; }
+    }
   </style>
 </head>
 <body>
-  <main class="clock" aria-label="Аналоговые часы с московским временем">
-    <div class="label">Moscow (MSK)</div>
-    <div class="hand hour" id="hourHand"></div>
-    <div class="hand minute" id="minuteHand"></div>
-    <div class="hand second" id="secondHand"></div>
-    <div class="center-dot"></div>
-  </main>
+  <div class="layout">
+    <section class="clock-wrap">
+      <main class="clock" aria-label="Аналоговые часы с московским временем">
+        <div class="label">Moscow (MSK)</div>
+        <div class="hand hour" id="hourHand"></div>
+        <div class="hand minute" id="minuteHand"></div>
+        <div class="hand second" id="secondHand"></div>
+        <div class="center-dot"></div>
+      </main>
+      <div class="alarm-banner" id="alarmBanner">Будильники не срабатывали.</div>
+    </section>
+
+    <aside class="panel" aria-label="Панель будильников">
+      <h2>Будильники</h2>
+      <form class="alarm-form" id="alarmForm">
+        <input id="alarmTime" type="time" required />
+        <input id="alarmText" type="text" maxlength="120" placeholder="Текст будильника" required />
+        <button type="submit">Добавить будильник</button>
+      </form>
+      <button class="stop-btn" id="stopAlarmBtn" type="button">Остановить сигнал</button>
+      <div class="alarms-list" id="alarmsList"></div>
+      <p class="empty" id="emptyState">Пока нет ни одного будильника.</p>
+    </aside>
+  </div>
 
   <script>
     const clock = document.querySelector('.clock');
     const hourHand = document.getElementById('hourHand');
     const minuteHand = document.getElementById('minuteHand');
     const secondHand = document.getElementById('secondHand');
+
+    const alarmForm = document.getElementById('alarmForm');
+    const alarmTimeInput = document.getElementById('alarmTime');
+    const alarmTextInput = document.getElementById('alarmText');
+    const alarmsList = document.getElementById('alarmsList');
+    const stopAlarmBtn = document.getElementById('stopAlarmBtn');
+    const alarmBanner = document.getElementById('alarmBanner');
+    const emptyState = document.getElementById('emptyState');
+
+    const alarms = [];
+    let alarmIdCounter = 1;
+    let activeRinging = [];
+    let audioContext;
+    let beeperInterval;
 
     const timeFormatter = new Intl.DateTimeFormat('ru-RU', {
       timeZone: 'Europe/Moscow',
@@ -181,6 +352,79 @@
       };
     };
 
+    const formatTime = (hour, minute) => `${String(hour).padStart(2, '0')}:${String(minute).padStart(2, '0')}`;
+
+    const renderAlarms = () => {
+      alarmsList.innerHTML = '';
+      emptyState.hidden = alarms.length > 0;
+
+      alarms.forEach((alarm) => {
+        const item = document.createElement('div');
+        item.className = 'alarm-item';
+        item.innerHTML = `
+          <span class="alarm-time">${alarm.time}</span>
+          <span class="alarm-text">${alarm.text}</span>
+          <button type="button" class="delete-btn" data-id="${alarm.id}">Удалить</button>
+        `;
+        alarmsList.append(item);
+      });
+    };
+
+    const beep = () => {
+      audioContext = audioContext || new AudioContext();
+      const oscillator = audioContext.createOscillator();
+      const gainNode = audioContext.createGain();
+      oscillator.type = 'square';
+      oscillator.frequency.value = 880;
+      gainNode.gain.value = 0.08;
+      oscillator.connect(gainNode);
+      gainNode.connect(audioContext.destination);
+      oscillator.start();
+      oscillator.stop(audioContext.currentTime + 0.22);
+    };
+
+    const startAlarmSignal = (messages) => {
+      const text = messages.map((m) => `• ${m}`).join(' ');
+      alarmBanner.textContent = `⏰ ${text}`;
+      alarmBanner.classList.add('active');
+      clock.classList.add('alarm-active');
+
+      clearInterval(beeperInterval);
+      beep();
+      beeperInterval = setInterval(beep, 700);
+    };
+
+    const stopAlarmSignal = () => {
+      activeRinging = [];
+      clearInterval(beeperInterval);
+      alarmBanner.textContent = 'Будильники не срабатывали.';
+      alarmBanner.classList.remove('active');
+      clock.classList.remove('alarm-active');
+    };
+
+    const checkAlarms = (hour, minute, second) => {
+      if (second !== 0) {
+        return;
+      }
+
+      const nowHHMM = formatTime(hour, minute);
+      const dayKey = new Date().toISOString().slice(0, 10);
+      const minuteKey = `${dayKey}-${nowHHMM}`;
+
+      const triggered = alarms.filter((alarm) => alarm.time === nowHHMM && alarm.lastTriggeredKey !== minuteKey);
+      if (triggered.length === 0) {
+        return;
+      }
+
+      triggered.forEach((alarm) => {
+        alarm.lastTriggeredKey = minuteKey;
+      });
+
+      activeRinging = triggered;
+      const messages = triggered.map((alarm) => `${alarm.time} — ${alarm.text}`);
+      startAlarmSignal(messages);
+    };
+
     const updateHands = () => {
       const { hour, minute, second } = getMoscowTime();
       const hourDeg = ((hour % 12) + minute / 60) * 30;
@@ -190,9 +434,48 @@
       hourHand.style.transform = `rotate(${hourDeg}deg)`;
       minuteHand.style.transform = `rotate(${minuteDeg}deg)`;
       secondHand.style.transform = `rotate(${secondDeg}deg)`;
+
+      checkAlarms(hour, minute, second);
     };
 
+    alarmForm.addEventListener('submit', (event) => {
+      event.preventDefault();
+      const time = alarmTimeInput.value;
+      const text = alarmTextInput.value.trim();
+
+      if (!time || !text) {
+        return;
+      }
+
+      alarms.push({
+        id: alarmIdCounter++,
+        time,
+        text,
+        lastTriggeredKey: null
+      });
+
+      renderAlarms();
+      alarmTextInput.value = '';
+    });
+
+    alarmsList.addEventListener('click', (event) => {
+      const btn = event.target.closest('.delete-btn');
+      if (!btn) {
+        return;
+      }
+
+      const id = Number(btn.dataset.id);
+      const idx = alarms.findIndex((alarm) => alarm.id === id);
+      if (idx >= 0) {
+        alarms.splice(idx, 1);
+        renderAlarms();
+      }
+    });
+
+    stopAlarmBtn.addEventListener('click', stopAlarmSignal);
+
     updateHands();
+    renderAlarms();
     setInterval(updateHands, 1000);
   </script>
 </body>
