@@ -1,0 +1,171 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Московские аналоговые часы</title>
+  <style>
+    :root {
+      color-scheme: dark;
+      --face-size: min(92vmin, 920px);
+      --face-color: #111827;
+      --border-color: #374151;
+      --accent: #ef4444;
+      --mark-color: #d1d5db;
+      --hand-color: #f9fafb;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100dvh;
+      display: grid;
+      place-items: center;
+      background: radial-gradient(circle at center, #1f2937 0%, #030712 70%);
+      font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif;
+    }
+
+    .clock {
+      position: relative;
+      width: var(--face-size);
+      aspect-ratio: 1;
+      border-radius: 50%;
+      background: var(--face-color);
+      border: clamp(6px, 1.2vmin, 12px) solid var(--border-color);
+      box-shadow: 0 0 32px rgba(0, 0, 0, 0.45), inset 0 0 22px rgba(255, 255, 255, 0.06);
+      display: grid;
+      place-items: center;
+    }
+
+    .center-dot {
+      position: absolute;
+      width: clamp(12px, 1.8vmin, 18px);
+      height: clamp(12px, 1.8vmin, 18px);
+      border-radius: 50%;
+      background: #fff;
+      z-index: 20;
+    }
+
+    .mark {
+      position: absolute;
+      width: 0.45vmin;
+      height: 4vmin;
+      min-height: 22px;
+      background: var(--mark-color);
+      border-radius: 999px;
+      transform: rotate(calc(var(--i) * 30deg)) translateY(calc(-0.46 * var(--face-size)));
+      transform-origin: center calc(0.46 * var(--face-size));
+      opacity: 0.95;
+    }
+
+    .mark.minor {
+      height: 2.2vmin;
+      min-height: 12px;
+      opacity: 0.45;
+    }
+
+    .hand {
+      position: absolute;
+      left: 50%;
+      bottom: 50%;
+      transform-origin: bottom center;
+      border-radius: 999px;
+      z-index: 10;
+    }
+
+    .hour {
+      width: clamp(8px, 1vmin, 12px);
+      height: 23%;
+      background: var(--hand-color);
+      margin-left: calc(clamp(8px, 1vmin, 12px) / -2);
+    }
+
+    .minute {
+      width: clamp(5px, 0.7vmin, 8px);
+      height: 33%;
+      background: #e5e7eb;
+      margin-left: calc(clamp(5px, 0.7vmin, 8px) / -2);
+    }
+
+    .second {
+      width: clamp(2px, 0.35vmin, 4px);
+      height: 37%;
+      background: var(--accent);
+      margin-left: calc(clamp(2px, 0.35vmin, 4px) / -2);
+    }
+
+    .label {
+      position: absolute;
+      top: 13%;
+      font-size: clamp(14px, 2.2vmin, 24px);
+      color: #9ca3af;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      user-select: none;
+    }
+  </style>
+</head>
+<body>
+  <main class="clock" aria-label="Аналоговые часы с московским временем">
+    <div class="label">Moscow (MSK)</div>
+    <div class="hand hour" id="hourHand"></div>
+    <div class="hand minute" id="minuteHand"></div>
+    <div class="hand second" id="secondHand"></div>
+    <div class="center-dot"></div>
+  </main>
+
+  <script>
+    const clock = document.querySelector('.clock');
+    const hourHand = document.getElementById('hourHand');
+    const minuteHand = document.getElementById('minuteHand');
+    const secondHand = document.getElementById('secondHand');
+
+    const timeFormatter = new Intl.DateTimeFormat('ru-RU', {
+      timeZone: 'Europe/Moscow',
+      hour: '2-digit',
+      minute: '2-digit',
+      second: '2-digit',
+      hourCycle: 'h23'
+    });
+
+    for (let i = 0; i < 60; i += 1) {
+      const mark = document.createElement('span');
+      mark.className = `mark ${i % 5 === 0 ? '' : 'minor'}`.trim();
+      mark.style.setProperty('--i', i / 5);
+
+      if (i % 5 !== 0) {
+        mark.style.transform = `rotate(${i * 6}deg) translateY(calc(-0.46 * var(--face-size)))`;
+      }
+
+      clock.append(mark);
+    }
+
+    const getMoscowTime = () => {
+      const parts = timeFormatter.formatToParts(new Date());
+      const values = Object.fromEntries(parts.filter((p) => p.type !== 'literal').map((p) => [p.type, Number(p.value)]));
+      return {
+        hour: values.hour,
+        minute: values.minute,
+        second: values.second
+      };
+    };
+
+    const updateHands = () => {
+      const { hour, minute, second } = getMoscowTime();
+      const hourDeg = ((hour % 12) + minute / 60) * 30;
+      const minuteDeg = (minute + second / 60) * 6;
+      const secondDeg = second * 6;
+
+      hourHand.style.transform = `rotate(${hourDeg}deg)`;
+      minuteHand.style.transform = `rotate(${minuteDeg}deg)`;
+      secondHand.style.transform = `rotate(${secondDeg}deg)`;
+    };
+
+    updateHands();
+    setInterval(updateHands, 1000);
+  </script>
+</body>
+</html>
