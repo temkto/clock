@@ -34,7 +34,7 @@
       margin: 0 auto;
       min-height: calc(100dvh - 48px);
       display: grid;
-      grid-template-columns: minmax(280px, 360px) minmax(0, 1fr);
+      grid-template-columns: minmax(0, 1fr) clamp(300px, 30vw, 420px);
       gap: clamp(16px, 2.8vw, 42px);
       align-items: start;
     }
@@ -45,7 +45,7 @@
       justify-items: center;
       justify-self: center;
       width: 100%;
-      padding-left: clamp(24px, 4vw, 80px);
+      padding-left: 0;
     }
 
     .clock {
