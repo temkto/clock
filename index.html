@@ -13,6 +13,7 @@
       --accent: #ef4444;
       --mark-color: #d1d5db;
       --hand-color: #f9fafb;
+      --track-radius: calc(0.41 * var(--face-size));
     }
 
     * {
@@ -50,21 +51,44 @@
     }
 
     .mark {
+      --mark-inset: clamp(8px, 1.2vmin, 14px);
       position: absolute;
+      left: 50%;
+      top: 50%;
       width: 0.45vmin;
-      height: 4vmin;
-      min-height: 22px;
+      height: 2.4vmin;
+      min-height: 14px;
       background: var(--mark-color);
       border-radius: 999px;
-      transform: rotate(calc(var(--i) * 30deg)) translateY(calc(-0.46 * var(--face-size)));
-      transform-origin: center calc(0.46 * var(--face-size));
+      transform: translate(-50%, -50%) rotate(calc(var(--i) * 6deg)) translateY(calc(-1 * (var(--track-radius) - var(--mark-inset))));
+      transform-origin: center center;
       opacity: 0.95;
+      z-index: 2;
+    }
+
+    .mark.major {
+      --mark-inset: clamp(12px, 1.8vmin, 20px);
+      height: 3.5vmin;
+      min-height: 20px;
+      opacity: 1;
     }
 
     .mark.minor {
-      height: 2.2vmin;
-      min-height: 12px;
       opacity: 0.45;
+    }
+
+    .hour-number {
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      transform: translate(-50%, -50%) rotate(calc(var(--i) * 30deg)) translateY(calc(-1 * (var(--track-radius) - clamp(32px, 5.4vmin, 58px)))) rotate(calc(var(--i) * -30deg));
+      color: #f3f4f6;
+      font-weight: 600;
+      font-size: clamp(18px, 3.4vmin, 42px);
+      line-height: 1;
+      user-select: none;
+      z-index: 3;
+      text-shadow: 0 0 8px rgba(17, 24, 39, 0.75);
     }
 
     .hand {
@@ -92,19 +116,20 @@
 
     .second {
       width: clamp(2px, 0.35vmin, 4px);
-      height: 37%;
+      height: 41%;
       background: var(--accent);
       margin-left: calc(clamp(2px, 0.35vmin, 4px) / -2);
     }
 
     .label {
       position: absolute;
-      top: 13%;
+      top: 18%;
       font-size: clamp(14px, 2.2vmin, 24px);
       color: #9ca3af;
       letter-spacing: 0.08em;
       text-transform: uppercase;
       user-select: none;
+      z-index: 4;
     }
   </style>
 </head>
@@ -133,14 +158,17 @@
 
     for (let i = 0; i < 60; i += 1) {
       const mark = document.createElement('span');
-      mark.className = `mark ${i % 5 === 0 ? '' : 'minor'}`.trim();
-      mark.style.setProperty('--i', i / 5);
-
-      if (i % 5 !== 0) {
-        mark.style.transform = `rotate(${i * 6}deg) translateY(calc(-0.46 * var(--face-size)))`;
-      }
-
+      mark.className = `mark ${i % 5 === 0 ? 'major' : 'minor'}`;
+      mark.style.setProperty('--i', i);
       clock.append(mark);
+
+      if (i % 5 === 0) {
+        const hourNumber = document.createElement('span');
+        hourNumber.className = 'hour-number';
+        hourNumber.style.setProperty('--i', i / 5);
+        hourNumber.textContent = String(i === 0 ? 12 : i / 5);
+        clock.append(hourNumber);
+      }
     }
 
     const getMoscowTime = () => {
